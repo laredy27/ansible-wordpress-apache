@@ -1,0 +1,18 @@
+---
+# tasks file for roles/common
+- name: Install yum updates
+  become: true
+  yum:
+     name: '*'
+     state: 'latest'
+     update_cache: yes
+
+- name: Install common packages
+  become: true
+  yum:
+    name: "{{ packages }}"
+    state: present
+
+- name: Disable SE Linux
+  become: true
+  command: /usr/sbin/setenforce 0

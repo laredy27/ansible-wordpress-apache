@@ -1,0 +1,31 @@
+---
+# tasks file for roles/wordpress
+- name: Download wordpress
+  get_url:
+    url: "https://wordpress.org/{{ wp_version }}.tar.gz"
+    dest: "/tmp/wordpress-{{ wp_version }}.tar.gz"
+
+- name: Unzip wordpress package
+  unarchive:
+    remote_src: yes
+    src: "/tmp/wordpress-{{ wp_version }}.tar.gz"
+    dest: "/tmp/"
+
+- name: Install wordpress 
+  copy:
+    remote_src: yes
+    src: "/tmp/wordpress/"
+    dest: /var/www/html/
+    owner: apache
+    group: apache
+    mode: 0755
+
+- name: Setup configurations
+  template:
+    src: ../templates/wp-config.php.j2
+    dest: "/var/www/html/wp-config.php"
+    owner: apache
+    group: apache
+    mode: 0644
+  notify: restart apache
+

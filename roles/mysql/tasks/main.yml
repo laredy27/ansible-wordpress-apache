@@ -1,0 +1,40 @@
+---
+# tasks file for roles/mysql
+
+- name: Install mysql repository
+  become: true
+  yum:
+    name: "https://dev.mysql.com/get/mysql{{ dbversion }}-community-release-el7-9.noarch.rpm"
+    state: present
+
+- name: Install mysql
+  become: true
+  yum:
+    name: mysql-community-server
+    state: present
+
+- name: Start mysql service
+  become: true
+  service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Update root password
+  become: true
+  shell: >
+    mysql -u root -p$(grep 'temporary password' /var/log/mysqld.log | tail -1| rev | cut -d ' ' -f 1 | rev) 
+    -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ dbpass | quote }}'" 
+    --connect-expired-password && touch /home/vagrant/mysql_root_pass_update.success
+  args:
+    creates: /home/vagrant/mysql_root_pass_update.success
+  notify: restart mysql
+
+- name: Create database
+  become: true
+  shell: > 
+    mysql -u root -p"{{ dbpass }}" 
+    -e "CREATE DATABASE {{ dbname | quote }}" && touch /home/vagrant/mysql_db_create.success
+  args:
+    creates: /home/vagrant/mysql_db_create.success
+  notify: restart mysql

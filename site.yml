@@ -1,0 +1,43 @@
+# site.yml
+- hosts: databases
+  pre_tasks:
+    - name: load secrets
+      include_vars:
+        file: secrets.yml
+  roles:
+    - common
+    - role: mysql
+      include_vars:
+        file: secrets.yml
+      vars:
+        dbname: "{{ mysql_db }}"
+        dbpass: "{{ mysql_pass }}"
+  tags:
+    db
+
+- hosts: webservers
+  become: true
+  pre_tasks:
+    - name: load secrets
+      include_vars:
+        file: secrets.yml
+  roles:
+    - common
+    - apache
+    - php
+    - role: wordpress
+      vars:
+        mysql_dbname: "{{ mysql_db }}"
+        mysql_dbpass: "{{ mysql_pass }}"
+        mysql_dbuser: root
+        mysql_dbhost: "{{ hostvars['db'].ansible_host }}"
+        wp_debug: true
+  tags:
+    web
+- hosts: loadbalancers
+  become: true
+  roles:
+    - common
+    - haproxy
+  tags:
+    lb

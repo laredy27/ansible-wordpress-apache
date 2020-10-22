@@ -1,0 +1,21 @@
+---
+# tasks file for roles/haproxy
+- name: Install HAProxy
+  yum:
+    name:
+      - haproxy
+
+- name: Ensure HAProxy is running
+  service:
+    name: haproxy
+    state: started
+    enabled: true
+
+- name: Upload loadbalancer config files
+  template:
+    src: ../templates/lb-config.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: haproxy
+    group: haproxy
+    mode: 0644
+  notify: restart haproxy

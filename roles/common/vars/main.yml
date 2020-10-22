@@ -1,0 +1,8 @@
+---
+# vars file for roles/common
+
+packages:
+    - epel-release
+    - yum-utils
+    - curl
+    - wget

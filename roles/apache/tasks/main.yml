@@ -1,0 +1,13 @@
+---
+# tasks file for roles/apache
+
+- name: Install apache
+  yum: 
+    name: 'httpd'
+    state: latest
+
+- name: Ensure apache server is running
+  service:
+    name: httpd
+    state: started
+    enabled: yes

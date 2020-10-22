@@ -1,0 +1,9 @@
+---
+# vars file for roles/php
+version: php71
+mods:
+    - php-common
+    - php-opcache
+    - php-mcrypt
+    - php-cli
+    - php-mysqlnd

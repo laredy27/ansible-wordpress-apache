@@ -1,0 +1,29 @@
+---
+# tasks file for roles/php
+
+- name: Install php repository
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+
+- name: Enable php repository
+  yum:
+    enablerepo: "remi-{{ version }}"
+    name: php
+    state: present
+
+- name: Install additional php modules
+  yum:
+    enablerepo: "remi-{{ version }}"
+    name: "{{ mods }}"
+    state: present
+
+- name: Verify php version
+  command: php -v
+  register: php_version
+
+- name: Debug php version
+  debug:
+    msg: "{{ php_version }}"
+
+
